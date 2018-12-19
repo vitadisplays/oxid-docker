@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.vitadisplays.docker.oxid</groupId>
+	<artifactId>oxid-eshop</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<php.version>5.6</php.version>
+	</properties>
+
+	<modules>
+		<module>base</module>
+		<module>nginx</module>
+		<module>development</module>
+	</modules>
+
+	<build>
+	<sourceDirectory>${project.basedir}/src/main/docker</sourceDirectory>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.21.0</version>
+					<extensions>true</extensions>
+					<configuration>
+						<logDate>default</logDate>
+						<autoPull>true</autoPull>
+						<images>
+							<image>
+								<name>vitadisplays/oxid-eshop/oxid-${project.artifactId}</name>
+								<alias>oxid-${project.artifactId}</alias>
+								<build>
+									<labels>
+										<maintainer>matthias.krause@vitadisplays.com</maintainer>
+										<version>${project.version}</version>
+										<artifactId>${project.artifactId}</artifactId>
+									</labels>
+									<args>
+									<phpversion>${php.version}</phpversion>
+									</args>
+									<tags>
+										<tag>php${php.version}</tag>
+										<tag>latest</tag>
+									</tags>
+									<dockerFileDir>${project.build.sourceDirectory}</dockerFileDir>
+									<compression>gzip</compression>
+								</build>
+							</image>
+						</images>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
