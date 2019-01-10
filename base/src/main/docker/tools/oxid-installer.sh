@@ -485,7 +485,7 @@ if [ -d "$INITOXID_DIR/modules.d" ]; then
 	for f in $INITOXID_DIR/modules.d/*; do
 		case "$f" in
 			*.php)    			echo "$PROGRAMM_NAME: running php -f $f"; php -f "$f" "$OXID_sShopDir";;
-			*.yml|*.json|*.ser)     echo "$PROGRAMM_NAME: import config $f"; php $OXID_ADMIN_TOOL --shop-dir="$OXID_sShopDir" import:shop-config $f || { echo "$PROGRAMM_NAME: shop config import of $f  failed." ; exit 1; };;
+			*.yml|*.json|*.ser)     echo "$PROGRAMM_NAME: import config $f"; php -f "$cwd/import-config.php" "$OXID_sShopDir" "$f" || { echo "$PROGRAMM_NAME: shop config import of $f  failed." ; exit 1; };;
 			*.sh)     echo "$PROGRAMM_NAME: running $f"; . "$f" "$OXID_sShopDir";;
 		esac
 		echo
@@ -498,7 +498,7 @@ if [ -d "$INITOXID_DIR/config.d" ]; then
 	
 	for f in $INITOXID_DIR/config.d/*; do
 		case "$f" in
-			*.yml|*.json|*.ser)     echo "$PROGRAMM_NAME: import config $f"; php $OXID_ADMIN_TOOL --shop-dir="$OXID_sShopDir" import:shop-config $f || { echo "$PROGRAMM_NAME: shop config import of $f  failed." ; exit 1; };;
+			*.yml|*.json|*.ser)     echo "$PROGRAMM_NAME: import config $f"; php -f "$cwd/import-config.php" "$OXID_sShopDir" "$f" || { echo "$PROGRAMM_NAME: shop config import of $f  failed." ; exit 1; };;
 			*.sh)     echo "$PROGRAMM_NAME: running $f"; . "$f" "$OXID_sShopDir";;
 			*.sql|*.sql.gz)     dumpSQLFile "$f";;
 		esac

@@ -3,13 +3,13 @@ FROM debian:stretch
 #RUN mkdir /docker-entrypoint-initoxid-sources.d /docker-entrypoint-initdb.d /docker-entrypoint-initoxid-scripts.d
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN echo "deb http://deb.debian.org/debian stretch non-free" > /etc/apt/sources.list.d/debian-non-free.list && apt-get update -y  && apt-get install -y supervisor apt-utils wget curl ca-certificates sudo cron apt-transport-https lsb-release rsync ssh unzip p7zip-rar gzip 
+RUN echo "deb http://deb.debian.org/debian stretch non-free" > /etc/apt/sources.list.d/debian-non-free.list && apt-get update -y  && apt-get install -y supervisor apt-utils wget curl ca-certificates sudo cron apt-transport-https lsb-release rsync ssh unzip p7zip-rar gzip
 
 # php
 ENV PHP_VERSION 5.6
 RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
 	echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list && \
-	apt-get update -y && apt-get install -y php$PHP_VERSION-fpm php$PHP_VERSION-cli php$PHP_VERSION-mysqlnd php$PHP_VERSION-imagick php$PHP_VERSION-mcrypt php$PHP_VERSION-xml php$PHP_VERSION-json php$PHP_VERSION-gd php$PHP_VERSION-curl php$PHP_VERSION-mbstring php$PHP_VERSION-soap php$PHP_VERSION-tidy php$PHP_VERSION-bcmath php$PHP_VERSION-zip php-apcu php-igbinary php-redis libphp-predis make php$PHP_VERSION-dev php-pear
+	apt-get update -y && apt-get install -y php$PHP_VERSION-fpm php$PHP_VERSION-cli php$PHP_VERSION-mysqlnd php$PHP_VERSION-imagick php$PHP_VERSION-mcrypt php$PHP_VERSION-xml php$PHP_VERSION-json php$PHP_VERSION-gd php$PHP_VERSION-curl php$PHP_VERSION-mbstring php$PHP_VERSION-soap php$PHP_VERSION-tidy php$PHP_VERSION-bcmath php$PHP_VERSION-zip php-apcu php-igbinary php-redis libphp-predis make php-yaml php$PHP_VERSION-dev php-pear
 
 RUN update-alternatives --set php /usr/bin/php$PHP_VERSION && \
 	update-alternatives --set phar /usr/bin/phar$PHP_VERSION && \
@@ -21,6 +21,8 @@ RUN pecl -v install rar && \
 	echo "extension=rar.so" >> /etc/php/$PHP_VERSION/mods-available/rar.ini && \
     phpenmod -v $PHP_VERSION rar
    
+RUN phpenmod -v $PHP_VERSION yaml
+       
 # mysql
 RUN apt-get install -y mysql-client
 
@@ -70,13 +72,8 @@ VOLUME ["/docker-entrypoint-initoxid"]
 
 # oxid tools
 COPY ./docker-entrypoint.sh /
-COPY ./oxid-installer.sh /
-COPY tools/oxid-admin-tools.phar /
-COPY tools/oxid-helper.inc.php /
-COPY tools/clear-cache.php /
-COPY tools/update-views.php /
-COPY tools/activate-module.php /
-COPY tools/deactivate-module.php /
+COPY tools/ /
+
 RUN chmod +x /docker-entrypoint.sh /oxid-installer.sh /oxid-admin-tools.phar
  
 ENTRYPOINT ["/docker-entrypoint.sh"]
