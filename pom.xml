@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<php.version>5.6</php.version>
+		<php.version>7.1</php.version>
 	</properties>
 
 	<modules>
@@ -38,9 +38,6 @@
 										<version>${project.version}</version>
 										<artifactId>${project.artifactId}</artifactId>
 									</labels>
-									<args>
-									<phpversion>${php.version}</phpversion>
-									</args>
 									<tags>
 										<tag>php${php.version}</tag>
 									</tags>

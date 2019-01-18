@@ -1,6 +1,6 @@
-FROM vitadisplays/oxid-eshop/oxid-nginx:php5.6
+FROM vitadisplays/oxid-eshop/oxid-nginx:php7.1
 
-ENV PHP_VERSION=5.6
+ENV PHP_VERSION=7.1
 
 # configure xdebug
 RUN mkdir -p -m ugo+w /var/log/php/$PHP_VERSION/profiler

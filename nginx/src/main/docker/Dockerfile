@@ -1,6 +1,6 @@
-FROM vitadisplays/oxid-eshop/oxid-base:php5.6
+FROM vitadisplays/oxid-eshop/oxid-base:php7.1
 
-ENV PHP_VERSION=5.6
+ENV PHP_VERSION=7.1
 
 # nginx
 ENV OXID_SHOP_HOME /srv/www/oxid
