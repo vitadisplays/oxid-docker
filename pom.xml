@@ -43,7 +43,6 @@
 									</args>
 									<tags>
 										<tag>php${php.version}</tag>
-										<tag>latest</tag>
 									</tags>
 									<dockerFileDir>${project.build.sourceDirectory}</dockerFileDir>
 									<compression>gzip</compression>
