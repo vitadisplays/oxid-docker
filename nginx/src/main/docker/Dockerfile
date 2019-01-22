@@ -1,4 +1,4 @@
-FROM vitadisplays/oxid-eshop/oxid-base:php5.6
+FROM vitadisplays/oxid-eshop-server-base:php5.6
 
 ENV PHP_VERSION=5.6
 

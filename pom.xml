@@ -30,7 +30,7 @@
 						<autoPull>true</autoPull>
 						<images>
 							<image>
-								<name>vitadisplays/oxid-eshop/oxid-${project.artifactId}</name>
+								<name>vitadisplays/oxid-eshop-server-${project.artifactId}</name>
 								<alias>oxid-${project.artifactId}</alias>
 								<build>
 									<labels>
@@ -45,7 +45,7 @@
 										<tag>php${php.version}</tag>
 									</tags>
 									<dockerFileDir>${project.build.sourceDirectory}</dockerFileDir>
-									<compression>gzip</compression>
+									<compression>gzip</compression>									
 								</build>
 							</image>
 						</images>

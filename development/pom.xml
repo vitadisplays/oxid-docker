@@ -6,7 +6,7 @@
 		<artifactId>oxid-eshop</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>development</artifactId>
+	<artifactId>nginx-dev</artifactId>
 	<packaging>docker-build</packaging>
 
 	<build>

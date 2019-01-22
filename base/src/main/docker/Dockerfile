@@ -33,7 +33,7 @@ RUN mkdir -p /tmp/zendguardloader && \
 	cd $(php$PHP_VERSION -i | grep extension_dir | cut -d' ' -f 5) && \
 	cp "/tmp/zendguardloader/zend-loader-php$PHP_VERSION-linux-x86_64/ZendGuardLoader.so" . && \
 	cp "/tmp/zendguardloader/zend-loader-php$PHP_VERSION-linux-x86_64/opcache.so" . && \
-	echo "; configuration for php zend guard loader module; priority=00\nzend_extension=ZendGuardLoader.so" > /etc/php/$PHP_VERSION/mods-available/zendguardloader.ini && \
+	echo "; configuration for php zend guard loader module\n; priority=00\nzend_extension=ZendGuardLoader.so" > /etc/php/$PHP_VERSION/mods-available/zendguardloader.ini && \
 	echo "zend_loader.enable=1" >> /etc/php/$PHP_VERSION/mods-available/zendguardloader.ini && \
 	echo "zend_loader.disable_licensing=1" >> /etc/php/$PHP_VERSION/mods-available/zendguardloader.ini && \
 	echo "zend_optimizer.optimization_level=15" >> /etc/php/$PHP_VERSION/mods-available/zendguardloader.ini && \
@@ -50,11 +50,11 @@ RUN mkdir -p /tmp/ioncube && \
 	tar xvf ioncube_loaders_lin_x86-64.tar.gz && \
 	cd $(php$PHP_VERSION -i | grep extension_dir | cut -d' ' -f 5) && \
 	cp /tmp/ioncube/ioncube/ioncube_loader_lin_$PHP_VERSION.so . && \
-	echo "; configuration for php ioncube loader module; priority=00\n\nzend_extension=ioncube_loader_lin_$PHP_VERSION.so" > /etc/php/$PHP_VERSION/mods-available/ioncube.ini && \
+	echo "; configuration for php ioncube loader module\n; priority=00\nzend_extension=ioncube_loader_lin_$PHP_VERSION.so" > /etc/php/$PHP_VERSION/mods-available/ioncube.ini && \
 	rm -rf /tmp/ioncube && \
 	phpenmod -v $PHP_VERSION ioncube
 
-# configure php5-fpm 
+# configure php-fpm 
 ADD php-fpm/www.conf /etc/php/$PHP_VERSION/fpm/pool.d/www.conf
 RUN mkdir -p -m ugo+w /var/run/php
 RUN mkdir -p -m ugo+w /var/log/php
