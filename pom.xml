@@ -13,7 +13,7 @@
 	<modules>
 		<module>base</module>
 		<module>nginx</module>
-		<module>development</module>
+		<!--<module>development</module>  -->
 	</modules>
 
 	<build>
@@ -23,7 +23,7 @@
 				<plugin>
 					<groupId>io.fabric8</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
-					<version>0.21.0</version>
+					<version>0.27.2</version>
 					<extensions>true</extensions>
 					<configuration>
 						<logDate>default</logDate>
@@ -38,14 +38,11 @@
 										<version>${project.version}</version>
 										<artifactId>${project.artifactId}</artifactId>
 									</labels>
-									<args>
-									<phpversion>${php.version}</phpversion>
-									</args>
 									<tags>
 										<tag>php${php.version}</tag>
 									</tags>
 									<dockerFileDir>${project.build.sourceDirectory}</dockerFileDir>
-									<compression>gzip</compression>									
+									<compression>gzip</compression>																			
 								</build>
 							</image>
 						</images>

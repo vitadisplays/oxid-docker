@@ -411,7 +411,7 @@ function cleanUp {
 	echo "$PROGRAMM_NAME: running $cwd/clear-cache.php"; php -f "$cwd/clear-cache.php" "$OXID_sShopDir"
 }
 
-if [ ! -f "${OXID_sShopDir}/pkg.info" ]; then	
+if [ ! -f "${OXID_sShopDir}/config.inc.php" ]; then	
 	# Oxid Sources	
 	if [ -d "$INITOXID_DIR/sources.d" ]; then
 		echo "$PROGRAMM_NAME: check for oxid sources in directory $INITOXID_DIR/sources.d"

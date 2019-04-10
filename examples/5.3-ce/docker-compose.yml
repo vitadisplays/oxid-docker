@@ -1,0 +1,21 @@
+version: '3'
+services:
+  database:
+    image: mysql:5.7
+    ports:
+     - "3306:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d/:ro
+    env_file: ./env 
+  oxid-eshop:
+    image: vitadisplays/oxid-eshop-server-nginx-dev:php5.6
+    ports:
+     - "80:80"
+     - "443:443"   
+    volumes:
+      - ./oxid-eshop:/srv/www/oxid
+      - ./provisioning:/docker-entrypoint-initoxid:ro
+    env_file: ./env         
+    depends_on:
+      - database                        

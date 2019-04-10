@@ -1,0 +1,23 @@
+# Set MySQL environment
+MYSQL_ROOT_PASSWORD=secret
+MYSQL_DATABASE=oxid
+MYSQL_USER=oxid
+MYSQL_PASSWORD=oxid
+
+# oxid eshop environment
+OXID_dbHost=database
+OXID_dbName=oxid
+OXID_dbUser=oxid
+OXID_dbPwd=oxid
+OXID_HOST=localhost
+OXID_sShopURL=https://localhost
+OXID_sSSLShopURL=https://localhost
+
+# enable utf mode
+OXID_iUtfMode=1
+
+# enable cron
+OXID_blUseCron=true
+
+# Install Demo data, if available
+OXID_DEMODATA=1			
