@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN echo "deb http://deb.debian.org/debian stretch non-free" > /etc/apt/sources.list.d/debian-non-free.list
 RUN apt-get update && apt-get upgrade -y 
 ONBUILD RUN apt-get update && apt-get upgrade -y 
-RUN apt-get install -y supervisor apt-utils wget curl ca-certificates sudo cron apt-transport-https lsb-release rsync ssh unzip p7zip-rar gzip
+RUN apt-get install -y supervisor apt-utils wget curl ca-certificates sudo cron apt-transport-https lsb-release rsync ssh zip unzip p7zip-rar gzip
 
 # php
 RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
@@ -88,6 +88,12 @@ RUN apt-get install -y git
 
 # install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# install nodejs
+RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+RUN apt-get install -y nodejs build-essential
+RUN npm install -g npm@latest
+RUN npm install -g grunt-cli@latest
 
 COPY supervisor/ /etc/supervisor/
 RUN sed -i "s|<PHP_VERSION>|$PHP_VERSION|g" /etc/supervisor/conf.d/20-php-fpm.conf

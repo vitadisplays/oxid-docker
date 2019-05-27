@@ -36,7 +36,9 @@ fi
 
 if [ ! -d "$OXID_sShopDir" ]; then
 	echo "$PROGRAMM_NAME: shop directory $OXID_sShopDir not found."
-	exit 1
+	mkdir -p "$OXID_sShopDir"
+	chown $OXID_CHOWNER "$OXID_sShopDir"
+	chgrp $OXID_CHOWNER "$OXID_sShopDir"
 fi
 
 if [ ! -w "$OXID_sShopDir" ]; then
@@ -524,6 +526,8 @@ cleanUp
 
 
 # Oxid File and Folder Permissions
+chown -R $OXID_CHOWNER "$OXID_sShopDir"
+chgrp -R $OXID_CHOWNER "$OXID_sShopDir"
 setFilePermissions
 
 # Information

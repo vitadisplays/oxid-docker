@@ -18,7 +18,9 @@ OXID_CHGROUP="www-data"
 #chown $OXID_CHOWNER $OXID_ROOT
 #chgrp $OXID_CHOWNER $OXID_ROOT
 
-sudo -E -u $OXID_CHOWNER -g $OXID_CHGROUP -- ./oxid-installer.sh $OXID_ROOT
+# installer
+#sudo -E -u $OXID_CHOWNER -g $OXID_CHGROUP -- ./oxid-installer.sh $OXID_ROOT
+./oxid-installer.sh $OXID_ROOT
 
 # Cron
 echo "* * * * *	$OXID_CHOWNER	/usr/bin/php -d display_errors --file $OXID_sShopDir/bin/cron.php > $OXID_ROOT/log/cron_log.txt" > /etc/cron.d/oxid_cron
