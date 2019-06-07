@@ -120,3 +120,108 @@ function changeToShop($sShopId)
     oxRegistry::getConfig()->setConfig(null);
     oxRegistry::set('oxconfig', $myConfig);*/
 }
+
+function resetContentCache()
+{
+    $blDeleteCacheOnLogout = oxRegistry::getConfig()->getConfigParam('blClearCacheOnLogout');
+    
+    if (! $blDeleteCacheOnLogout) {
+        // reset output cache
+        /** @var oxCache $oCache */
+        $oCache = oxNew('oxcache');
+        $oCache->reset(false);
+        
+        oxRegistry::getUtils()->oxResetFileCache();
+    }
+}
+
+function activateTheme($sTheme)
+{
+
+    /** @var oxTheme $oTheme */
+    $oTheme = oxNew('oxtheme');
+    if (!$oTheme->load($sTheme)) {
+        oxRegistry::get("oxUtilsView")->addErrorToDisplay(oxNew("oxException", 'EXCEPTION_THEME_NOT_LOADED'));
+        
+        return;
+    }
+    try {
+        $oTheme->activate();
+        resetContentCache();
+    } catch (oxException $oEx) {
+        oxRegistry::get("oxUtilsView")->addErrorToDisplay($oEx);
+        $oEx->debugOut();
+    }
+}
+
+function _updateOxTime($soxId)
+{
+    $oDb = oxDb::getDb();
+    $sO2CView = getViewName('oxobject2category');
+    $soxId = $oDb->quote($soxId);
+    $sSqlShopFilter = "";
+    $sShopId = oxRegistry::getConfig()->getShopId();
+    $sSqlShopFilter = "and oxshopid = {$sShopId}";
+    // updating oxtime values
+    $sQ = "update oxobject2category set oxtime = 0 where oxobjectid = {$soxId} {$sSqlShopFilter} and oxid = (
+                    select oxid from (
+                        select oxid from {$sO2CView} where oxobjectid = {$soxId} {$sSqlShopFilter}
+                        order by oxtime limit 1
+                    ) as _tmp
+                )";
+    $oDb->execute($sQ);
+}
+
+function resetArtSeoUrl($aArtIds, $aCatIds = null)
+{
+    if (empty($aArtIds)) {
+        return;
+    }
+    
+    if (! is_array($aArtIds)) {
+        $aArtIds = array(
+            $aArtIds
+        );
+    }
+    
+    $sShopId = oxRegistry::getConfig()->getShopId();
+    foreach ($aArtIds as $sArtId) {
+        /** @var oxSeoEncoder $oSeoEncoder */
+        oxRegistry::get("oxSeoEncoder")->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
+    }
+}
+
+function addArticleToCategory($sArticleId, $sCatId)
+{
+    $myConfig = oxRegistry::getConfig();
+    $oDb = oxDb::getDb();
+    $sO2CView = getViewName('oxobject2category');
+    
+    $sSelect = "select 1 from " . $sO2CView . " as oxobject2category where oxobject2category.oxcatnid= " . $oDb->quote($sCatId) . " and oxobject2category.oxobjectid = " . $oDb->quote($sArticleId) . " ";
+    
+    if (! $oDb->getOne($sSelect, false, false)) {
+        $sShopID = $myConfig->getShopId();
+        
+        $oNew = oxNew('oxobject2category');
+        $oNew->setId(md5($sArticleId . $sCatId . $sShopID));
+        $oNew->oxobject2category__oxobjectid = new oxField($sArticleId);
+        $oNew->oxobject2category__oxcatnid = new oxField($sCatId);
+        $oNew->oxobject2category__oxtime = new oxField(time());
+        
+        $oNew->save();
+        
+        _updateOxTime($sArticleId);
+        
+        resetArtSeoUrl($sArticleId);
+        resetContentCache();
+        
+        $oCategory = oxNew('oxCategory');
+        $oCategory->executeDependencyEvent(array(
+            $sCatId
+        ));
+        
+        return true;
+    }
+    
+    return false;
+}

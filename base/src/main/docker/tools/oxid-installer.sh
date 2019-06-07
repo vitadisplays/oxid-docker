@@ -309,6 +309,13 @@ function moduleInstall {
 	fi
 }
 
+function activateTheme {
+	local ThemeId=$1
+	local ShopId=$2	
+
+	echo "$PROGRAMM_NAME: running $cwd/activate-theme.php for theme $ThemeId on Shop $ShopId"; php -f "$cwd/activate-theme.php" "$OXID_sShopDir" "$ThemeId" "$ShopId"
+}
+
 function activateModule {
 	local ModuleId=$1
 	local ShopId=$2	
