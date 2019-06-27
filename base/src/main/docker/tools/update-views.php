@@ -1,4 +1,5 @@
 <?php
+
 include_once __DIR__ ."/oxid-helper.inc.php";
 
 $sShopId = $argv[2];

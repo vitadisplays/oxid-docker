@@ -191,7 +191,7 @@ function resetArtSeoUrl($aArtIds, $aCatIds = null)
     }
 }
 
-function addArticleToCategory($sArticleId, $sCatId)
+function addArticleToCategory($sArticleId, $sCatId, $iPos = 0)
 {
     $myConfig = oxRegistry::getConfig();
     $oDb = oxDb::getDb();
@@ -207,6 +207,7 @@ function addArticleToCategory($sArticleId, $sCatId)
         $oNew->oxobject2category__oxobjectid = new oxField($sArticleId);
         $oNew->oxobject2category__oxcatnid = new oxField($sCatId);
         $oNew->oxobject2category__oxtime = new oxField(time());
+        $oNew->oxobject2category__oxpos = new oxField($iPos);
         
         $oNew->save();
         

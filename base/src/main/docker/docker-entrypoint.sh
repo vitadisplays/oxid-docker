@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 PROGRAMM_NAME=$0
