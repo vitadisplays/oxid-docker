@@ -9,14 +9,14 @@ ENV OXID_SHOP_HOME /srv/www/oxid
 ARG SGNGX_VERSION 
 ENV SGNGX_VERSION ${SGNGX_VERSION:-jj_nginx_pagespeed_unknown} 
 ARG INSTALL_NGINX_VERSION 
-ENV INSTALL_NGINX_VERSION ${INSTALL_NGINX_VERSION:-1.14.2} 
+ENV INSTALL_NGINX_VERSION ${INSTALL_NGINX_VERSION:-1.16.1} 
 ARG INSTALL_PAGESPEED_VERSION 
 ENV INSTALL_PAGESPEED_VERSION ${INSTALL_PAGESPEED_VERSION:-latest-stable} 
 
 # Build nginx with pagespeed and brotli support
 RUN apt-get update && apt-get upgrade -y 
 ONBUILD RUN apt-get update && apt-get upgrade -y 
-RUN apt-get install -y --no-install-recommends curl sudo build-essential zlib1g-dev libpcre3 libpcre3-dev unzip wget libssl-dev ca-certificates
+RUN apt-get install -y --no-install-recommends curl sudo build-essential zlib1g-dev libpcre3 libpcre3-dev libgd-dev unzip wget libssl-dev ca-certificates
 
 RUN echo "USING NGINX: ${INSTALL_NGINX_VERSION}" && \
       echo "USING PAGESPEED: ${INSTALL_PAGESPEED_VERSION}" && \
@@ -36,6 +36,7 @@ RUN echo "USING NGINX: ${INSTALL_NGINX_VERSION}" && \
         --with-http_v2_module \
         --with-http_stub_status_module \
         --with-http_realip_module \
+        --with-http_image_filter_module \
         --without-http_autoindex_module \
         --without-http_browser_module \
         --without-http_memcached_module \
@@ -80,10 +81,7 @@ RUN openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
 COPY nginx/ /etc/nginx/
 COPY pagespeed/ /etc/nginx/
 
-RUN sed -i "s|<PHP_VERSION>|$PHP_VERSION|g" /etc/nginx/sites-available/oxid.conf && \
-	sed -i "s|<ROOT_DIR>|$OXID_SHOP_HOME|g" /etc/nginx/sites-available/oxid.conf && \
-	rm -f /etc/nginx/sites-enabled/* && \
-	ln -s /etc/nginx/sites-available/oxid.conf /etc/nginx/sites-enabled/ && \
+RUN rm -f /etc/nginx/sites-enabled/* && \
 	ln -s /etc/nginx/modules-available/pagespeed.conf /etc/nginx/modules-enabled/
 	
 RUN usermod --non-unique --uid 1000 www-data \
@@ -100,7 +98,8 @@ RUN mkdir -p /srv/www/oxid && chown -R www-data:www-data /srv/www/oxid &&\
 COPY supervisor/ /etc/supervisor/
 
 VOLUME ["/srv/www/oxid"]
-VOLUME ["/etc/nginx"]
+VOLUME ["/etc/nginx/conf.d"]
+VOLUME ["/etc/nginx/"]
 VOLUME ["/var/log/nginx"]
 
 EXPOSE 80

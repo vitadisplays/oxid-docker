@@ -1,5 +1,4 @@
 <?php
-
 include_once __DIR__ ."/oxid-helper.inc.php";
 
 $sFilename = $argv[2];

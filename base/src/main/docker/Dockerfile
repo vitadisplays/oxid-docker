@@ -8,12 +8,12 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN echo "deb http://deb.debian.org/debian stretch non-free" > /etc/apt/sources.list.d/debian-non-free.list
 RUN apt-get update && apt-get upgrade -y 
 ONBUILD RUN apt-get update && apt-get upgrade -y 
-RUN apt-get install -y supervisor apt-utils wget curl ca-certificates sudo cron apt-transport-https lsb-release rsync ssh zip unzip p7zip-rar gzip
+RUN apt-get install -y supervisor apt-utils wget curl ca-certificates ntpdate sudo cron apt-transport-https lsb-release rsync ssh zip unzip p7zip-rar gzip
 
 # php
-RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-	echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list && \
-	apt-get update && \
+RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+RUN	apt-get update && \
 	apt-get install -y php$PHP_VERSION-fpm php$PHP_VERSION-cli php$PHP_VERSION-mysqlnd php$PHP_VERSION-imagick php$PHP_VERSION-mcrypt php$PHP_VERSION-xml php$PHP_VERSION-json php$PHP_VERSION-gd php$PHP_VERSION-curl php$PHP_VERSION-mbstring php$PHP_VERSION-soap php$PHP_VERSION-tidy php$PHP_VERSION-bcmath php$PHP_VERSION-zip php-apcu php-igbinary php-redis libphp-predis make php-yaml php$PHP_VERSION-dev php-pear
 
 RUN update-alternatives --set php /usr/bin/php$PHP_VERSION && \
@@ -80,9 +80,6 @@ RUN apt-get install -y php-xdebug && \
 	
 RUN mkdir -p -m ugo+w /var/log/php/$PHP_VERSION/profiler
 
-# install image optimizers
-RUN apt-get install -y optipng jpegoptim gifsicle
-
 # install git
 RUN apt-get install -y git
 
@@ -94,6 +91,11 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 RUN apt-get install -y nodejs build-essential
 RUN npm install -g npm@latest
 RUN npm install -g grunt-cli@latest
+
+
+# install image optimizers
+RUN apt-get install -y optipng jpegoptim libjpeg-turbo-progs gifsicle webp
+RUN npm install -g svgo
 
 COPY supervisor/ /etc/supervisor/
 RUN sed -i "s|<PHP_VERSION>|$PHP_VERSION|g" /etc/supervisor/conf.d/20-php-fpm.conf

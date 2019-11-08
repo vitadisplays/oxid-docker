@@ -49,6 +49,11 @@ fi
 
 export OXID_sShopDir=$OXID_sShopDir
 
+if [ -z "$OXID_GETIMG_PATH" ]; then
+	OXID_GETIMG_PATH="/getimg.php"
+fi
+export OXID_GETIMG_PATH=$OXID_GETIMG_PATH
+
 TMP_DIR="/tmp"
 RESORCES_DIR="$INITOXID_DIR/resources.d"
 export RESORCES_DIR=$RESORCES_DIR
