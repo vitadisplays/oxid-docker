@@ -19,17 +19,15 @@ map $sent_http_content_type $expires {
   ~(application/font|application/x-font|application/vnd.ms-fontobject)	max;
 }
 
-##
-# proxy cache Settings
-##
-proxy_cache_path ${OXID_SHOP_HOME}/tmp/image_cache levels=1:2 use_temp_path=off keys_zone=oxid_image_cache:10M max_size=2048M inactive=1d;
+map $request_uri $skip_cache {
+  default 1;
+  ~/out/pictures/generated/.*(\.webp|\.svg)$ 0;
+}
 
 ##
-# Logformat imagegen
+# cache Settings
 ##
-log_format imagegen  '$proxy_host [$time_local] '
-                           '"$request" $status $body_bytes_sent '
-                           '"$http_user_agent" "$gzip_ratio"';
+fastcgi_cache_path /var/cache/nginx/oxid_fastcgi_cache levels=1:2 keys_zone=oxid_fastcgi_cache:200m max_size=10g inactive=1dm use_temp_path=off;
                            
 ##
 # php
@@ -43,7 +41,6 @@ upstream php {
 ##
 map $server_port $fastcgi_param_https {
   default on;
-  80 off;
 }
 
 server {
@@ -63,7 +60,11 @@ server {
   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
   ssl_certificate /etc/nginx/ssl/oxid.crt;
   ssl_certificate_key /etc/nginx/ssl/oxid.key;
+
     
+  #pagespeed
+  pagespeed off;
+
   index index.php index.html;
 
   # status
@@ -84,7 +85,7 @@ server {
     deny all;
 
     include fastcgi_params;
-    fastcgi_pass unix:/var/run/php/php5.6-www.sock;
+    fastcgi_pass php;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     fastcgi_param HTTPS $fastcgi_param_https;
   }
@@ -103,29 +104,36 @@ server {
     deny all;
   }
 
-  location ~ /out/pictures/generated/.*(\.jpg|\.gif|\.png|\.webp|\.svg)$ {
+  location ~ /out/pictures/generated/.*(\.jpe?g|\.gif|\.png|\.webp|\.svg)$ {
+    try_files $uri ${OXID_GETIMG_PATH};
+
+    expires $expires;
+    add_header Cache-Control "public, must-revalidate, proxy-revalidate, s-max-age=$s_max_age" always;      
+  }
+
+  location = /modules/vd/optimizer/core/getoptimizedimg.php {
+    fastcgi_cache oxid_fastcgi_cache;
+    fastcgi_cache_key "$request_uri";
+    fastcgi_cache_valid 200 301 302 1d;
+    fastcgi_cache_valid 404 1m;
+    fastcgi_cache_min_uses 1;
+    fastcgi_cache_lock on;
+    fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
+    fastcgi_hide_header Cache-Control;
+    fastcgi_hide_header Pragma;
+    fastcgi_hide_header Expires;
+    fastcgi_hide_header X-Accel-Expires;
+    fastcgi_cache_bypass $skip_cache;  
+    fastcgi_no_cache $skip_cache;
+
+    include fastcgi_params;
+    fastcgi_pass php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param HTTPS $fastcgi_param_https;
+
+    add_header X-FastCGI-Cache $upstream_cache_status;
     expires $expires;
     add_header Cache-Control "public, must-revalidate, proxy-revalidate, s-max-age=$s_max_age" always;
-
-    #try_files $uri ${OXID_GETIMG_PATH};
-    proxy_pass        http://127.0.0.1:9991;
-    
-    proxy_cache       oxid_image_cache;
-    proxy_cache_key   "$uri";
-    
-    proxy_buffering on;
-    proxy_cache_valid 200 302 60m;
-    
-    proxy_ignore_headers Expires;
-    proxy_ignore_headers X-Accel-Expires;
-    proxy_ignore_headers Cache-Control;
-    proxy_ignore_headers Set-Cookie;
-
-    proxy_hide_header X-Accel-Expires;
-    proxy_hide_header Expires;
-    proxy_hide_header Cache-Control;
-    proxy_hide_header Pragma;    
-    proxy_set_header X-IMAGEGEN-DELETE "yes";     
   }
 
   # This block will catch static file requests, such as images, css, js
@@ -156,41 +164,17 @@ server {
     try_files _ @php;
   }
 
+
   location ~ \.php$ {
     try_files _ @php;
   }
 
   location @php {
     try_files $uri =404;
-    include /etc/nginx/fastcgi_params;
+    
+    include fastcgi_params;
     fastcgi_pass php;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     fastcgi_param HTTPS $fastcgi_param_https;
   }
-
-}
-
-server {
-  listen 9991;
-  allow 127.0.0.1;
-  deny all;
-  root ${OXID_SHOP_HOME};
-  
-  access_log /var/log/nginx/imamgegen_access.log imagegen;
-  error_log /var/log/nginx/imamgegen_error.log;
-        
-  location ~ /out/pictures/generated/.*(\.jpg|\.gif|\.png|\.webp|\.svg)$ {
-    try_files $uri ${OXID_GETIMG_PATH};
-  }
-  
-  location ~ \.php$ {
-    try_files _ @php;
-  }
-
-  location @php {
-    include /etc/nginx/fastcgi_params;
-    fastcgi_pass php;
-    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    fastcgi_param HTTPS $fastcgi_param_https;
-  }  
 }

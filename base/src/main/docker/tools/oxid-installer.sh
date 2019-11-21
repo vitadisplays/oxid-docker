@@ -238,9 +238,15 @@ function unpackArchive {
 
 function moduleInstallLegacy {
 	local TMP_FILE=""
-	local ARCHIVE_FILE=$1	
-	local COPY_MATRIX=$2
-	local EXCLUDES=$3
+	local ARCHIVE_FILE="${1}"
+	shift
+	local COPY_MATRIX="${1}"
+	
+	if [ -n "$COPY_MATRIX" ]; then
+		shift
+	fi	
+
+	local EXCLUDES=("${@}")
 	
 	if [[ $ARCHIVE_FILE =~ (.rar|.zip|.gz|.bz2)$ ]] ; then
 		BASENAME=$(basename ${ARCHIVE_FILE} .${ARCHIVE_FILE##*.})
@@ -249,10 +255,12 @@ function moduleInstallLegacy {
 		ARCHIVE_FILE=$TMP_FILE	
 	fi
 	
-	if [ -z "$EXCLUDES" ]; then
-		EXCLUDES=(".*" ".*/" "vendor/" "composer.lock" "composer.phar")
-	fi
-	
+	EXCLUDE_STRING=''  
+	for e in "${EXCLUDES[@]}"
+	do :
+		EXCLUDE_STRING+=" --exclude=${e}"
+	done		
+			
 	if [ -z "$COPY_MATRIX" ]; then
 		COPY_MATRIX="copy_this/ = ,changed_full/ = "
 	fi
@@ -275,12 +283,7 @@ function moduleInstallLegacy {
 				mkdir -p "$SHOP_DEST_DIR"
 			fi
 			
-			EXCLUDE_STRING=''
-			for e in "${EXCLUDES[@]}"
-			do :
-   				EXCLUDE_STRING+=" --exclude=${e}"
-			done
-			
+			echo "$PROGRAMM_NAME: rsync -av -m --force $EXCLUDE_STRING \"${SOURCE}\" \"${SHOP_DEST}\"";
 			rsync -av --force $EXCLUDE_STRING "${SOURCE}" "${SHOP_DEST}"
 		else
 			echo "$PROGRAMM_NAME: copy $SOURCE to $SHOP_DEST not found. ignored."

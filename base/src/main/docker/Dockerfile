@@ -94,7 +94,7 @@ RUN npm install -g grunt-cli@latest
 
 
 # install image optimizers
-RUN apt-get install -y optipng jpegoptim libjpeg-turbo-progs gifsicle webp
+RUN apt-get install -y optipng jpegoptim libjpeg-turbo-progs trimage gifsicle webp
 RUN npm install -g svgo
 
 COPY supervisor/ /etc/supervisor/
