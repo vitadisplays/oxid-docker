@@ -143,7 +143,10 @@ COMPOSER_CACHE_DIR=$OXID_sShopDir/tmp/composer
 export COMPOSER_CACHE_DIR=$COMPOSER_CACHE_DIR
 
 # MySQL settings
-mysql_params="--host=$OXID_dbHost --user=$OXID_dbUser --password=$OXID_dbPwd $OXID_dbName"
+mysql_params="--default_character_set utf8 --host=$OXID_dbHost --user=$OXID_dbUser --password=$OXID_dbPwd $OXID_dbName"
+if [  "$OXID_iUtfMode" == "0" ]; then
+	mysql_params="--default_character_set latin1 --host=$OXID_dbHost --user=$OXID_dbUser --password=$OXID_dbPwd $OXID_dbName"
+fi
 
 function unsetFilePermissions {
 	if [ -f "$OXID_sShopDir/config.inc.php" ]; then

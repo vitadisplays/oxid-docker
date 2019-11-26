@@ -94,6 +94,7 @@ server {
     log_not_found off;
     access_log off;
   }
+  
   location = /robots.txt {
     allow all;
     log_not_found off;
@@ -150,7 +151,7 @@ server {
     try_files $uri/ /$1/index.php?$args;
   }
 
-  location ~ /(export|out|tmp|views)/ {
+  location ~ /(export|tmp|views)/ {
   }
 
   location / {
